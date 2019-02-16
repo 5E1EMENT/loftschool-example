@@ -64,7 +64,7 @@ function returnFnResult(fn) {
    console.log(f()); // выведет 13
  */
 function returnCounter(number) {
-    if(number == null) {
+    if(number == undefined) {
         number = 0;
     }
     return function() {
@@ -85,10 +85,10 @@ function returnCounter(number) {
    returnArgumentsArray(1, 2, 3) вернет [1, 2, 3]
  */
 function returnArgumentsArray() {
-    var args = [];
-    for (var i = 0; i < arguments.length; i++) {
-        args[i] = arguments[i];
-    }
+    var args = [...arguments];
+    // for (var i = 0; i < arguments.length; i++) {
+    //     args[i] = arguments[i];
+    // }
     return args;
 }
 
