@@ -21,14 +21,14 @@ function isAllTrue(array, fn) {
     if (typeof (fn) !== 'function') {
 
         throw new Error('fn is not a function')
-    } else if (( !Array.isArray(array) ) || (array.length === 0)) {
+    }
+    if (( !Array.isArray(array) ) || (array.length === 0)) {
 
         throw new Error('empty array')
-    } else {
-        for (let item of array) {
-            if (!fn(item)) {
-                return false;
-            }
+    }
+    for (let item of array) {
+        if (!fn(item)) {
+            return false;
         }
     }
 
@@ -57,15 +57,15 @@ function isSomeTrue(array, fn) {
     if (( !Array.isArray(array) ) || (array.length === 0)) {
 
         throw new Error('empty array');
-    } else if (typeof fn !== 'function') {
+    }
+    if (typeof fn !== 'function') {
 
         throw new Error('fn is not a function');
-    } else {
+    }
 
-        for (let item of array) {
-            if (fn(item)) {
-                return true;
-            }
+    for (let item of array) {
+        if (fn(item)) {
+            return true;
         }
     }
 
@@ -126,40 +126,21 @@ function calculator(number=0) {
         throw new Error('number is not a number');
     }
     var obj = {
-        sum: function(...args) {
+        sum: (...args) => args.reduce((number, current) => { return number + current }, number),
+        dif: (...args) => args.reduce((number, current) => { return number - current }, number),
+        div: (...args) => args.reduce((number, current) => {
+            if (current === 0) {
+                throw new Error('division by 0');
+            }
 
-            return args.reduce(function(number, current) {
-                return number + current;
-            }, number);
-        },
-        dif: function (...args) {
-
-            return args.reduce(function(number, current) {
-                return number - current;
-            }, number);
-        },
-        div: function (...args) {
-
-            return args.reduce(function(number, current) {
-                if (current === 0) {
-                    throw new Error('division by 0');
-                }
-
-                return number / current;
-            }, number);
-        },
-        mul: function (...args) {
-
-            return args.reduce(function(number, current) {
-                return number * current;
-            }, number);
-        }
-
+            return number / current;
+        }, number),
+        mul: (...args) => args.reduce((number, current) => { return number * current}, number)
     }
 
     return obj;
-
 }
+
 
 /* При решении задач, пострайтесь использовать отладчик */
 
