@@ -17,7 +17,6 @@
    isAllTrue([100, 2, 3, 4, 5], n => n < 10) // вернет false
  */
 function isAllTrue(array, fn) {
-    var [a, b] = [0, 0];
 
     if (typeof (fn) !== 'function') {
 
@@ -26,23 +25,14 @@ function isAllTrue(array, fn) {
 
         throw new Error('empty array')
     } else {
-        for ( var i = 0; i < array.length; i ++) {
-
-            let r = fn(array[i]);
-
-            if (r == false) {
-                b++;
-            } else if (r == true) {
-                a++;
-            }
-            if (array.length == a) {
-                return true;
-            } else if (b > 0) {
+        for (let item of array) {
+            if (!fn(item)) {
                 return false;
             }
-
         }
     }
+
+    return true;
 
 }
 
@@ -63,7 +53,6 @@ function isAllTrue(array, fn) {
    isSomeTrue([1, 2, 3, 4, 5], n => n > 20) // вернет false
  */
 function isSomeTrue(array, fn) {
-    let a = 0;
 
     if (( !Array.isArray(array) ) || (array.length === 0)) {
 
@@ -73,22 +62,14 @@ function isSomeTrue(array, fn) {
         throw new Error('fn is not a function');
     } else {
 
-        for (let i = 0; i < array.length; i++) {
-            let r = fn(array[i]);
-            if (r == true) {
-                a++;
+        for (let item of array) {
+            if (fn(item)) {
+                return true;
             }
         }
-
-        if (a < 1) {
-            return false;
-        } else {
-            (a >= 1)
-        }
-        {
-            return true;
-        }
     }
+
+    return false;
 }
 
 /*
@@ -102,26 +83,24 @@ function isSomeTrue(array, fn) {
  3.3: Необходимо выбрасывать исключение в случаях:
    - fn не является функцией (с текстом "fn is not a function")
  */
-function returnBadArguments(fn) {
+function returnBadArguments(fn, ...items) {
 
     let a = [];
-    let b = [];
 
     if (typeof fn !== 'function') {
 
         throw new Error('fn is not a function');
     } else {
-        for (let i = 1; i < arguments.length; i++) {
+        for (let item of items) {
             try {
-                b = fn(arguments[i]);
+                fn(item);
             } catch (e) {
-                a.push(arguments[i]);
+                a.push(item);
             }
-
         }
-
-        return a;
     }
+
+    return a;
 }
 
 /*
@@ -147,57 +126,39 @@ function calculator(number=0) {
         throw new Error('number is not a number');
     }
     var obj = {
-        sum: function () {
+        sum: function(...args) {
 
-            for ( var i = 0; i < arguments.length; i++) {
-
-                if (arguments[i] == 0) {
-                    throw new Error('division by 0');
-                }
-                number += arguments[i];
-            }
-
-            return number;
+            return args.reduce(function(number, current) {
+                return number + current;
+            }, number);
         },
-        dif: function () {
+        dif: function (...args) {
 
-            for ( var i = 0; i < arguments.length; i++) {
-
-                if (arguments[i] == 0) {
-                    throw new Error('division by 0');
-                }
-                number -= arguments[i];
-            }
-
-            return number;
+            return args.reduce(function(number, current) {
+                return number - current;
+            }, number);
         },
-        div: function () {
+        div: function (...args) {
 
-            for ( var i = 0; i < arguments.length; i++) {
-
-                if (arguments[i] == 0) {
+            return args.reduce(function(number, current) {
+                if (current === 0) {
                     throw new Error('division by 0');
                 }
-                number /= arguments[i];
-            }
 
-            return number;
+                return number / current;
+            }, number);
         },
-        mul: function () {
+        mul: function (...args) {
 
-            for ( var i = 0; i < arguments.length; i++) {
-
-                if (arguments[i] == 0) {
-                    throw new Error('division by 0');
-                }
-                number *= arguments[i];
-            }
-
-            return number;
+            return args.reduce(function(number, current) {
+                return number * current;
+            }, number);
         }
+
     }
 
     return obj;
+
 }
 
 /* При решении задач, пострайтесь использовать отладчик */
