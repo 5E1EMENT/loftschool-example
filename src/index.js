@@ -106,9 +106,9 @@ function findError(where) {
  */
 function deleteTextNodes(where) {
 
-    for (var child of where.childNodes) {
-        if (child.nodeType === 3) {
-            child.remove();
+    for (let node of where.childNodes) {
+        if (node.nodeType === 3) {
+            node.remove()
         }
     }
 
@@ -127,16 +127,12 @@ function deleteTextNodes(where) {
  */
 function deleteTextNodesRecursive(where) {
 
-    let foo = Array.from(where.childNodes);
-
-    for (let i = 0; i < foo.length; i++) {
-
-        if (foo[i].nodeType === 3) {
-            where.removeChild(foo[i])
+    for (let node of where.childNodes) {
+        if (node.nodeType === 3) {
+            node.nodeValue = '';
         } else {
-            deleteTextNodes(foo[i])
+            deleteTextNodesRecursive(node);
         }
-
     }
 
 }
