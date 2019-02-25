@@ -17,14 +17,6 @@
  */
 const homeworkContainer = document.querySelector('#homework-container');
 
-
-const newBtn = document.createElement('button');
-
-newBtn.textContent = 'Кнопка';
-
-homeworkContainer.appendChild(newBtn);
-
-
 // использование Math.round() даст неравномерное распределение!
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -156,9 +148,22 @@ function createDiv() {
    addListeners(newDiv);
  */
 function addListeners(target) {
-    target.addEventListener('drag', function (e) {
 
+    var xOffset;
+    var yOffset;
+
+    target.addEventListener('dragstart', function (e) {
+        target.style.position = 'absolute';
+        xOffset = e.offsetX;
+        yOffset = e.offsetY;
+    });
+
+    target.addEventListener('dragend', function (e) {
+        target.style.position = 'absolute';
+        target.style.top = (e.pageY - xOffset) + 'px';
+        target.style.left = (e.pageX - yOffset) + 'px';
     })
+
 }
 
 let addDivButton = homeworkContainer.querySelector('#addDiv');
