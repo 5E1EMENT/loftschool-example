@@ -30,29 +30,6 @@
  */
 const homeworkContainer = document.querySelector('#homework-container');
 
-const loadDiv = document.createElement('div');
-
-loadDiv.id ="loading-block";
-loadDiv.textContent = "Загрузка..."
-homeworkContainer.appendChild(loadDiv);
-
-const filterDiv = document.createElement('div');
-
-filterDiv.id ="filter-block";
-filterDiv.style.display="none";
-homeworkContainer.appendChild(filterDiv);
-
-const newInput = document.createElement('input');
-
-newInput.type = "text";
-newInput.placeholder = "название города";
-newInput.id ="filter-input";
-filterDiv.appendChild(newInput);
-
-const resultDiv = document.createElement('div');
-
-resultDiv.id ="filter-result";
-filterDiv.appendChild(resultDiv);
 /*
  Функция должна вернуть Promise, который должен быть разрешен с массивом городов в качестве значения
 
@@ -85,7 +62,7 @@ function loadTowns() {
                 let sortCities = cities.sort(sortName);
 
 
-                //console.log(sortCities);
+
                 filterBlock.style.display = 'block';
                 loadingBlock.style.display = 'none';
                 resolve(sortCities)
