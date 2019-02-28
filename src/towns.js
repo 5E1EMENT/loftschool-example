@@ -30,16 +30,51 @@
  */
 const homeworkContainer = document.querySelector('#homework-container');
 
+const loadDiv = document.createElement('div');
+
+loadDiv.id ="loading-block";
+loadDiv.textContent = "Загрузка..."
+homeworkContainer.appendChild(loadDiv);
+
+const filterDiv = document.createElement('div');
+
+filterDiv.id ="filter-block";
+filterDiv.style.display="none";
+homeworkContainer.appendChild(filterDiv);
+
+const newInput = document.createElement('input');
+
+newInput.type = "text";
+newInput.placeholder = "название города";
+newInput.id ="filter-input";
+filterDiv.appendChild(newInput);
+
+const resultDiv = document.createElement('div');
+
+resultDiv.id ="filter-result";
+filterDiv.appendChild(resultDiv);
 /*
  Функция должна вернуть Promise, который должен быть разрешен с массивом городов в качестве значения
 
  Массив городов пожно получить отправив асинхронный запрос по адресу
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
+
 function loadTowns() {
     return new Promise((resolve, reject) => {
         let url = 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json';
         let xhr = new XMLHttpRequest();
+
+        function sortName(a, b) {
+
+            if ( a.name < b.name ) {
+                return -1;
+            } else if ( a.name > b.name ) {
+                return 1;
+            }
+
+            return 0;
+        }
 
         xhr.open('get', url);
         xhr.send();
@@ -47,10 +82,16 @@ function loadTowns() {
 
             if (xhr.status <= 400) {
                 let cities = JSON.parse(xhr.responseText);
+                let sortCities = cities.sort(sortName);
 
-                resolve(cities)
+
+                //console.log(sortCities);
+                filterBlock.style.display = 'block';
+                loadingBlock.style.display = 'none';
+                resolve(sortCities)
 
             } else {
+
                 reject();
             }
 
@@ -72,8 +113,9 @@ function loadTowns() {
 function isMatching(full, chunk) {
 
     var fullWord = full.toLowerCase();
+    var chunkWord = chunk.toLowerCase();
 
-    if (fullWord.includes(chunk)) {
+    if (fullWord.includes(chunkWord)) {
         return true
 
     } else {
@@ -93,6 +135,30 @@ const filterResult = homeworkContainer.querySelector('#filter-result');
 
 filterInput.addEventListener('keyup', function() {
     // это обработчик нажатия кливиш в текстовом поле
+    var inputValue = filterInput.value;
+
+    loadTowns().then(function (towns) {
+
+        filterResult.innerHTML = '';
+        filterResult.style.background = 'yellow';
+
+        for (var town of towns) {
+
+            var townName = town.name;
+
+            if (isMatching(townName, inputValue) && inputValue != '') {
+
+                var resultItem = document.createElement('span');
+
+                resultItem.textContent = townName;
+                resultItem.style.display = "block";
+                filterResult.appendChild(resultItem);
+
+            }
+
+        }
+    });
+
 });
 
 export {
