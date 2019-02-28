@@ -1,7 +1,7 @@
 const HtmlPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const rules = require('./webpack.config.rules');
+const rules = require('./webpack.config.rules')();
 const fs = require('fs');
 const path = require('path');
 
