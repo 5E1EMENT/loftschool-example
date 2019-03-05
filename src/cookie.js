@@ -82,7 +82,7 @@ for ( let i in cookieObj) {
 }
 let btnDelete = document.querySelectorAll('.delete-btn');
 
-var functionDelete = (cookies) => {
+var functionDelete = () => {
 
     for ( var btn of btnDelete) {
         let btnParentTr = btn.closest("tr");
@@ -94,13 +94,12 @@ var functionDelete = (cookies) => {
             for ( let i in cookieObj) {
                 let cookieName = i;
 
-                console.log(cookies);
-                console.log(cookieName);
+                console.log(cookieObj);
                 if (cookieName == btnParentAttr) {
                     let cookieDate = new Date ();  // Текущая дата и время
 
                     cookieDate.setTime ( cookieDate.getTime() - 1 );
-                    cookies = cookieName += "=; expires=" + cookieDate.toGMTString();
+                    document.cookie = cookieName += "=; expires=" + cookieDate.toGMTString();
                     btnParentTr.remove();
                 }
 
@@ -109,10 +108,9 @@ var functionDelete = (cookies) => {
         })
     }
 }
-functionDelete(cookie);
+functionDelete();
 
 addButton.addEventListener('click', () => {
-
     let btnDelete = document.querySelectorAll('.delete-btn');
     // здесь можно обработать нажатие на кнопку "добавить cookie"
     let tr = document.createElement('tr');
@@ -135,9 +133,8 @@ addButton.addEventListener('click', () => {
         tr.appendChild(tdDelete);
         listTable.appendChild(tr);
     }
-    let newcookie = document.cookie;
-    console.log(newcookie);
-    functionDelete(newcookie);
+
+    functionDelete();
 
     addNameInput.value = '';
     addValueInput.value = '';
