@@ -44,12 +44,30 @@ const addButton = homeworkContainer.querySelector('#add-button');
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
 filterNameInput.addEventListener('keyup', function() {
-
+    var inputValue = filterNameInput.value;
     // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
+    createTable().then((cookies) =>{
+        listTable.innerHTML = '';
+            console.log(cookies);
+
+        for(var cookie in cookies) {
+            var cookieName = cookie;
+
+            console.log(isMatching(cookieName, inputValue));
+
+            if(isMatching(cookieName, inputValue) && inputValue != '') {
+
+                createTable();
+
+            }
+
+        }
+
+    }
+    );
 });
 
 let cookie = document.cookie;
-
 let cookieObj = cookie.split('; ').reduce((prev, current) => {
     const [name, value] = current.split('=');
 
@@ -58,61 +76,75 @@ let cookieObj = cookie.split('; ').reduce((prev, current) => {
     return prev;
 }, {});
 
-for ( let i in cookieObj) {
-    let tr = document.createElement('tr');
-    let tdName = document.createElement('td');
-    let tdValue = document.createElement('td');
-    let tdDelete = document.createElement('td');
-    let cookieName = i;
-    let cookieValue = cookieObj[i];
-    tdName.textContent = cookieName;
-    tdName.classList.add('cookieName');
-    tdValue.textContent = cookieValue;
-    tdValue.classList.add('cookieValue');
-    tdDelete.innerHTML = '<button class="delete-btn">Удалить куку</button>';
-    tdDelete.setAttribute('data-name', cookieName);
+function createTable() {
+    return new Promise((resolve, reject) => {
+        for ( let i in cookieObj) {
+            let tr = document.createElement('tr');
+            let tdName = document.createElement('td');
+            let tdValue = document.createElement('td');
+            let tdDelete = document.createElement('td');
+            let cookieName = i;
+            let cookieValue = cookieObj[i];
+            tdName.textContent = cookieName;
+            tdName.classList.add('cookieName');
+            tdValue.textContent = cookieValue;
+            tdValue.classList.add('cookieValue');
+            tdDelete.innerHTML = '<button class="delete-btn">Удалить куку</button>';
+            tdName.setAttribute('data-name', cookieName);
 
-    if (cookie != '') {
-        tr.appendChild(tdName);
-        tr.appendChild(tdValue);
-        tr.appendChild(tdDelete);
-        listTable.appendChild(tr);
-    }
-
-}
-let btnDelete = document.querySelectorAll('.delete-btn');
-
-var functionDelete = () => {
-
-    for ( var btn of btnDelete) {
-        let btnParentTr = btn.closest("tr");
-        let btnParentTd = btn.closest("td");
-        let btnParentAttr = btnParentTd.getAttribute('data-name');
-
-        btn.addEventListener('click', function () {
-
-            for ( let i in cookieObj) {
-                let cookieName = i;
-
-                console.log(cookieObj);
-                if (cookieName == btnParentAttr) {
-                    let cookieDate = new Date ();  // Текущая дата и время
-
-                    cookieDate.setTime ( cookieDate.getTime() - 1 );
-                    document.cookie = cookieName += "=; expires=" + cookieDate.toGMTString();
-                    btnParentTr.remove();
-                }
-
+            if (cookie != '') {
+                tr.appendChild(tdName);
+                tr.appendChild(tdValue);
+                tr.appendChild(tdDelete);
+                listTable.appendChild(tr);
             }
-
-        })
-    }
+            resolve(cookieObj)
+        }
+    })
 }
-functionDelete();
+createTable();
+function delCookie (name) {
+    let cookieDate = new Date(); // Текущая дата и время
+    cookieDate.setTime(cookieDate.getTime() - 1);
+    document.cookie = name += '=; expires=' + cookieDate.toGMTString();
+}
+
+function isMatching(full, chunk) {
+
+    if (full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1) {
+
+        return true;
+    } else {
+
+        return false;
+    }
+
+}
+listTable.addEventListener('click', event => {
+    let target = event.target;
+
+    if (target.tagName === 'BUTTON') {
+        let tr = target.closest('tr');
+        let name = tr.firstElementChild.getAttribute('data-name');
+        //console.log(name);
+        delCookie(name);
+        tr.remove();
+    }
+});
 
 addButton.addEventListener('click', () => {
-    let btnDelete = document.querySelectorAll('.delete-btn');
-    // здесь можно обработать нажатие на кнопку "добавить cookie"
+
+    //Обращаемся к новым кукам
+    let cookie = document.cookie;
+    let cookieObjNew = cookie.split('; ').reduce((prev, current) => {
+        const [name, value] = current.split('=');
+
+        prev[name] = value;
+
+        return prev;
+    }, {});
+
+    //Добавляем строку в таблицу
     let tr = document.createElement('tr');
     let tdName = document.createElement('td');
     let tdValue = document.createElement('td');
@@ -120,25 +152,42 @@ addButton.addEventListener('click', () => {
     let cookieName = addNameInput.value.trim();
     let cookieValue = addValueInput.value.trim();
 
-    if (cookieName !='' && cookieValue !='') {
-        document.cookie = `${cookieName}=${cookieValue}`;
+    //Проходим циклом по всем куки из новых кук
+    for ( let cookie in cookieObjNew) {
 
-        tdName.textContent = `${cookieName}`;
-        tdName.classList.add('cookieName');
-        tdValue.textContent = `${cookieValue}`;
-        tdValue.classList.add('cookieValue');
-        tdDelete.innerHTML = '<button class="delete-btn">Удалить куку</button>';
-        tr.appendChild(tdName);
-        tr.appendChild(tdValue);
-        tr.appendChild(tdDelete);
-        listTable.appendChild(tr);
+        //Добавим куку если не пустые значения
+        if (cookieName !='' && cookieValue !='' ) {
+            document.cookie = `${cookieName}=${cookieValue}`;
+            tdName.textContent = `${cookieName}`;
+            tdName.dataset.name = `${cookieName}`;
+            tr.dataset.name = `${cookieName}`;
+            tdValue.textContent = `${cookieValue}`;
+            tdValue.classList.add('cookieValue');
+            tdDelete.innerHTML = '<button class="delete-btn">Удалить куку</button>';
+
+            //Если имя добавляемой куки уже есть в таблице
+            if (cookieName == cookie) {
+                cookieObj[cookie] = cookieValue;
+                let AllTr = document.querySelectorAll('tbody tr');
+
+                //Проходимся циклом по всем строкам в таблице и удалим, первый попавшийся
+                for (let i of AllTr) {
+                    let tr = AllTr[0];
+                    let name = tr.firstElementChild.getAttribute('data-name');
+                    tr.remove();
+                }
+            }
+            tr.appendChild(tdName);
+            tr.appendChild(tdValue);
+            tr.appendChild(tdDelete);
+            listTable.appendChild(tr);
+
+        }
+
     }
-
-    functionDelete();
 
     addNameInput.value = '';
     addValueInput.value = '';
 
 });
-
 
