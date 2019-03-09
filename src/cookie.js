@@ -53,6 +53,8 @@ let cookieObj = cookie.split('; ').reduce((prev, current) => {
     return prev;
 }, {});
 
+let flag = false;
+
 filterNameInput.addEventListener('keyup', function() {
     //Предварительно очищаем таблицу от всех куки
     listTable.innerHTML = '';
@@ -96,15 +98,15 @@ filterNameInput.addEventListener('keyup', function() {
             tdDelete.innerHTML = '<button class="delete-btn">Удалить куку</button>';
             tdName.setAttribute('data-name', cookieName);
 
-
-            //Если имя добавляемой куки уже есть в таблице
+            //Если имя фильтруемой куки уже есть в таблице
             if (cookieName == cookie) {
-
+                flag = true;
             }
             tr.appendChild(tdName);
             tr.appendChild(tdValue);
             tr.appendChild(tdDelete);
             listTable.appendChild(tr);
+
         }
 
     }
@@ -112,6 +114,7 @@ filterNameInput.addEventListener('keyup', function() {
     if (inputValue == '') {
         listTable.innerHTML = '';
         createTable();
+        flag = false;
     }
 
 });
@@ -148,7 +151,8 @@ function createTable() {
         tdDelete.innerHTML = '<button class="delete-btn">Удалить куку</button>';
         tdName.setAttribute('data-name', cookieName);
         tr.dataset.name = `${cookieName}`;
-        //console.log(cookieName);
+
+
         //Если куки не равна пустому месту, то прикрепляем созданные элементы к таблице
         if (cookie != '') {
             tr.appendChild(tdName);
@@ -198,6 +202,7 @@ listTable.addEventListener('click', event => {
 
 //По клику на кнопку добавить куки
 addButton.addEventListener('click', () => {
+
     var inputValue = filterNameInput.value;
 
     //Обращаемся к новым кукам
@@ -236,26 +241,33 @@ addButton.addEventListener('click', () => {
                 cookieObj[cookie] = cookieValue;
                 let AllTr = document.querySelectorAll('tbody tr');
 
-                //Проходимся циклом по всем строкам в таблице и удалим, первый попавшийся
+                //Если имя куки есть в таблице при фильтре
 
+                //Проходимся циклом по всем строкам в таблице и удалим, первый попавшийся
                 for(let tr of AllTr) {
+
+                    //Если имя строки равно имени куки
                     if(tr.dataset.name == `${cookieName}`) {
+                        console.log(tr.dataset.name)
                         tr.remove();
                     }
 
                 }
-                // let name = tr.firstElementChild.getAttribute('data-name');
-                // tr.remove();
 
             }
 
-            //Проверка на совпадение элементов
-            if(isMatching(cookieName, inputValue) ) {
-                tr.appendChild(tdName);
-                tr.appendChild(tdValue);
-                tr.appendChild(tdDelete);
-                listTable.appendChild(tr);
+            //Если нет значения в фильтре
+            if(!flag) {
+
+                //Проверка на совпадение элементов
+                if(isMatching(cookieName, inputValue) ) {
+                    tr.appendChild(tdName);
+                    tr.appendChild(tdValue);
+                    tr.appendChild(tdDelete);
+                    listTable.appendChild(tr);
+                }
             }
+
         }
 
     }
