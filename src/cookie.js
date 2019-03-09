@@ -59,8 +59,6 @@ filterNameInput.addEventListener('keyup', function() {
     //Предварительно очищаем таблицу от всех куки
     listTable.innerHTML = '';
 
-    let cookieValue = addValueInput.value.trim();
-
     //Обновляем переменную куки при каждом нажатии
     let cookies = document.cookie;
     let cookieObj = cookies.split('; ').reduce((prev, current) => {
@@ -80,6 +78,7 @@ filterNameInput.addEventListener('keyup', function() {
 
         //Для убдобства присваиваем куки новую переменную
         var cookieName = cookie;
+        var cookieValue = cookieObj[cookie];
 
         console.log(isMatching(cookieName, inputValue));
 
@@ -109,7 +108,36 @@ filterNameInput.addEventListener('keyup', function() {
 
         }
 
+        //Если совпадает значение куки с символом в поиске
+        if(isMatching(cookieValue, inputValue) ) {
+
+            //То создаем для каждого совпавшего варианта tr в таблице
+            let tr = document.createElement('tr');
+            let tdName = document.createElement('td');
+            let tdValue = document.createElement('td');
+            let tdDelete = document.createElement('td');
+            tdName.textContent = cookieName;
+            tdName.classList.add('cookieName');
+            tdValue.textContent = cookieValue;
+            tdValue.classList.add('cookieValue');
+            tdDelete.innerHTML = '<button class="delete-btn">Удалить куку</button>';
+            tdName.setAttribute('data-name', cookieName);
+
+            //Если значение фильтруемой куки уже есть в таблице
+            if (cookieValue == cookie) {
+                flag = true;
+            }
+            tr.appendChild(tdName);
+            tr.appendChild(tdValue);
+            tr.appendChild(tdDelete);
+            listTable.appendChild(tr);
+
+        }
+
     }
+
+
+
     //А если очищаем поиск, то повторно создаем таблицу
     if (inputValue == '') {
         listTable.innerHTML = '';
