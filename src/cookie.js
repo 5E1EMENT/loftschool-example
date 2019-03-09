@@ -43,31 +43,8 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-filterNameInput.addEventListener('keyup', function() {
-    var inputValue = filterNameInput.value;
-    // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
-    createTable().then((cookies) =>{
-        listTable.innerHTML = '';
-            console.log(cookies);
-
-        for(var cookie in cookies) {
-            var cookieName = cookie;
-
-            console.log(isMatching(cookieName, inputValue));
-
-            if(isMatching(cookieName, inputValue) && inputValue != '') {
-
-                createTable();
-
-            }
-
-        }
-
-    }
-    );
-});
-
 let cookie = document.cookie;
+
 let cookieObj = cookie.split('; ').reduce((prev, current) => {
     const [name, value] = current.split('=');
 
@@ -76,39 +53,124 @@ let cookieObj = cookie.split('; ').reduce((prev, current) => {
     return prev;
 }, {});
 
-function createTable() {
-    return new Promise((resolve, reject) => {
-        for ( let i in cookieObj) {
+filterNameInput.addEventListener('keyup', function() {
+    //Предварительно очищаем таблицу от всех куки
+    listTable.innerHTML = '';
+
+    let cookieValue = addValueInput.value.trim();
+
+    //Обновляем переменную куки при каждом нажатии
+    let cookies = document.cookie;
+    let cookieObj = cookies.split('; ').reduce((prev, current) => {
+        const [name, value] = current.split('=');
+
+        prev[name] = value;
+
+        return prev;
+    }, {});
+
+    //Считываем значение инпута
+    var inputValue = filterNameInput.value;
+    console.log(cookieObj);
+
+    //Проходимся циклом по всем куки в объекте
+    for(var cookie in cookieObj) {
+
+        //Для убдобства присваиваем куки новую переменную
+        var cookieName = cookie;
+
+        console.log(isMatching(cookieName, inputValue));
+
+        //Если совпадает имя куки с символом в поиске
+        if(isMatching(cookieName, inputValue) ) {
+
+            //То создаем для каждого совпавшего варианта tr в таблице
             let tr = document.createElement('tr');
             let tdName = document.createElement('td');
             let tdValue = document.createElement('td');
             let tdDelete = document.createElement('td');
-            let cookieName = i;
-            let cookieValue = cookieObj[i];
             tdName.textContent = cookieName;
             tdName.classList.add('cookieName');
-            tdValue.textContent = cookieValue;
+            tdValue.textContent = cookieObj[cookie];
             tdValue.classList.add('cookieValue');
             tdDelete.innerHTML = '<button class="delete-btn">Удалить куку</button>';
             tdName.setAttribute('data-name', cookieName);
 
-            if (cookie != '') {
-                tr.appendChild(tdName);
-                tr.appendChild(tdValue);
-                tr.appendChild(tdDelete);
-                listTable.appendChild(tr);
+
+            //Если имя добавляемой куки уже есть в таблице
+            if (cookieName == cookie) {
+
             }
-            resolve(cookieObj)
+            tr.appendChild(tdName);
+            tr.appendChild(tdValue);
+            tr.appendChild(tdDelete);
+            listTable.appendChild(tr);
         }
-    })
+
+    }
+    //А если очищаем поиск, то повторно создаем таблицу
+    if (inputValue == '') {
+        listTable.innerHTML = '';
+        createTable();
+    }
+
+});
+
+
+//Функция создания таблицы
+function createTable() {
+
+//Обновляем данные куки
+    let cookie = document.cookie;
+
+    let cookieObj = cookie.split('; ').reduce((prev, current) => {
+        const [name, value] = current.split('=');
+
+        prev[name] = value;
+
+        return prev;
+    }, {});
+
+    //Проходимся циклом по всем куки в объекте
+    for ( let i in cookieObj) {
+
+        //Для каждого создаем tr
+        let tr = document.createElement('tr');
+        let tdName = document.createElement('td');
+        let tdValue = document.createElement('td');
+        let tdDelete = document.createElement('td');
+        let cookieName = i;
+        let cookieValue = cookieObj[i];
+        tdName.textContent = cookieName;
+        tdName.classList.add('cookieName');
+        tdValue.textContent = cookieValue;
+        tdValue.classList.add('cookieValue');
+        tdDelete.innerHTML = '<button class="delete-btn">Удалить куку</button>';
+        tdName.setAttribute('data-name', cookieName);
+        tr.dataset.name = `${cookieName}`;
+        //console.log(cookieName);
+        //Если куки не равна пустому месту, то прикрепляем созданные элементы к таблице
+        if (cookie != '') {
+            tr.appendChild(tdName);
+            tr.appendChild(tdValue);
+            tr.appendChild(tdDelete);
+            listTable.appendChild(tr);
+        }
+
+    }
+
 }
+//Первичное создание таблицы
 createTable();
+
+//Функция удаления куки
 function delCookie (name) {
     let cookieDate = new Date(); // Текущая дата и время
     cookieDate.setTime(cookieDate.getTime() - 1);
     document.cookie = name += '=; expires=' + cookieDate.toGMTString();
 }
 
+//Функция проверки на совпадение элементов
 function isMatching(full, chunk) {
 
     if (full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1) {
@@ -120,6 +182,8 @@ function isMatching(full, chunk) {
     }
 
 }
+
+//Функция удаления куки
 listTable.addEventListener('click', event => {
     let target = event.target;
 
@@ -132,7 +196,9 @@ listTable.addEventListener('click', event => {
     }
 });
 
+//По клику на кнопку добавить куки
 addButton.addEventListener('click', () => {
+    var inputValue = filterNameInput.value;
 
     //Обращаемся к новым кукам
     let cookie = document.cookie;
@@ -171,21 +237,30 @@ addButton.addEventListener('click', () => {
                 let AllTr = document.querySelectorAll('tbody tr');
 
                 //Проходимся циклом по всем строкам в таблице и удалим, первый попавшийся
-                for (let i of AllTr) {
-                    let tr = AllTr[0];
-                    let name = tr.firstElementChild.getAttribute('data-name');
-                    tr.remove();
-                }
-            }
-            tr.appendChild(tdName);
-            tr.appendChild(tdValue);
-            tr.appendChild(tdDelete);
-            listTable.appendChild(tr);
 
+                for(let tr of AllTr) {
+                    if(tr.dataset.name == `${cookieName}`) {
+                        tr.remove();
+                    }
+
+                }
+                // let name = tr.firstElementChild.getAttribute('data-name');
+                // tr.remove();
+
+            }
+
+            //Проверка на совпадение элементов
+            if(isMatching(cookieName, inputValue) ) {
+                tr.appendChild(tdName);
+                tr.appendChild(tdValue);
+                tr.appendChild(tdDelete);
+                listTable.appendChild(tr);
+            }
         }
 
     }
 
+    //В конце очищаем поля
     addNameInput.value = '';
     addValueInput.value = '';
 
